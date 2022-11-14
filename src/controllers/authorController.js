@@ -6,15 +6,15 @@ const createAuthor = async function (req, res) {
     const { fname, lname, title, email, password } = req.body
     try {
         if (!fname || !lname || !title || !email || !password) {
-            res.status(400).send({ msg: "all field is required" })
+            return res.status(400).send({ status: false, msg: "all field is required" })
         }
         else {
             const data = await authorModel.create({ fname, lname, title, email, password })
-            res.status(201).send({ msg: "data created succesfully", data })
+            return res.status(201).send({ status: true, data: "data created succesfully", data })
         }
     }
     catch (err) {
-        res.status(500).send({ msg: err.message })
+        return res.status(500).send({ status: false, msg: err.message })
     }
 }
 

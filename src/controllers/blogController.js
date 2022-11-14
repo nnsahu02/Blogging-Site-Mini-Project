@@ -6,23 +6,23 @@ const { get } = require('lodash')
 
 //create Blog
 const createBlog = async function (req, res) {
-    const { title, body, authorId, tag, category, subcategory } = req.body
+    const { title, body, authorId, tag, category, subcategory, isPublished, isDeleted } = req.body
     try {
         if (!title || !body || !authorId || !category) {
-            res.status(400).send({ msg: "all fields are required" })
+            return res.status(400).send({ status: false, msg: "all fields are required" })
         }
         if (!isValidObjectId(authorId)) {
-            res.status(400).send({ msg: "invalid authorid in validation" })
+            return res.status(400).send({ status: false, msg: "invalid authorid in validation" })
         }
         const authorDetail = await authorModel.findById(authorId)
-        if (authorDetail._id != authorId) {
-            res.status(400).send({ msg: "invalid authorid" })
+        if (!authorDetail) {
+            return res.status(400).send({ status: false, msg: "invalid authorid" })
         }
-        const data = await blogModel.create({ title, body, authorId, tag, category, subcategory })
-        res.status(201).send({ msg: "succesfully created data", data })
+        const data = await blogModel.create({ title, body, authorId, tag, category, subcategory, isPublished, isDeleted })
+        return res.status(201).send({ status: true, data: "succesfully created data", data })
     }
     catch (err) {
-        res.status(500).send({ msg: err.message })
+        return res.status(500).send({ status: false, msg: err.message })
     }
 }
 
@@ -32,16 +32,16 @@ const getBlogs = async function (req, res) {
     try {
         const data = await blogModel.find({ isDeleted: false, isPublished: true })
         if (!data) {
-            res.status(404).send({ msg: "no data found!" })
+            return res.status(404).send({ status: false, msg: "no data found!" })
         }
         const query = req.query
         let datas = await blogModel.find(query)
         if (!datas) {
-            res.status(404).send("not found")
-        } res.status(200).send({ msg: datas })
+            return res.status(404).send({ status: false, msg: "not found" })
+        } res.status(200).send({ status: true, data: datas })
     }
     catch (err) {
-        res.status(500).send({ msg: err.message })
+        return res.status(500).send({ status: false, msg: err.message })
     }
 }
 

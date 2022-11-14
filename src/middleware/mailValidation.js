@@ -8,13 +8,13 @@ const validateEmail = function (req, res, next) {
         let validMail = /^[A-Za-z.]{2,}@[A-Za-z]{2,}[.]{1}[A-Za-z.]{2,3}$/
         let check = validMail.test(req.body.email)
         if (!check) {
-            res.status(400).send({ msg: "mail id is not valid" })
+            return res.status(400).send({ status: false, msg: "mail id is not valid" })
         }
         else {
             next()
         }
     } catch (err) {
-        res.status(500).send({ msg: err.message })
+        return res.status(500).send({ status: false, msg: err.message })
     }
 }
 
