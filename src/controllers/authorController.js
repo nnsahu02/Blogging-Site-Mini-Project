@@ -12,8 +12,8 @@ const createAuthor = async function(req ,res) {
             res.status(201).send({msg : "data created succesfully" , data})
         }
     }
-catch(error) {
-    res.status(500).send({msg : "internal server error" , error})
+catch(err) {
+    res.status(500).send({msg : err.message})
 }
 }
 
