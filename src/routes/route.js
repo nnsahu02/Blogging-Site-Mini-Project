@@ -4,9 +4,14 @@ const authorController = require("../controllers/authorController")
 const mailValidation = require("../middleware/mailValidation")
 const blogController = require('../controllers/blogController')
 
-
+//creating Author
 router.post("/authors", mailValidation.validateEmail, authorController.createAuthor)
-router.post('/blogs' , blogController.createBlog)
+
+//creating blogs
+router.post('/blogs', blogController.createBlog)
+
+//getting blogdata
+router.get('/blogs', blogController.getBlogs)
 
 
 module.exports = router

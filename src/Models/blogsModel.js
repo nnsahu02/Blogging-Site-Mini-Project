@@ -13,17 +13,17 @@ const blogSchema = new mongoose.Schema({
     authorId: {
         type: ObjectId,
         ref: "author",
-        required : true
+        required: true
     },
     tag: {
-        type: String,
+        type: [String],
     },
     category: {
         type: String,
         required: true
     },
     subcategoty: {
-        type: String
+        type: [String]
     },
     isDeleted: {
         type: Boolean,
