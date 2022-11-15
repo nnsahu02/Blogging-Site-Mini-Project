@@ -49,6 +49,7 @@ const getBlogs = async function (req, res) {
     }
 }
 
+
 // update blog
 const updateBlogs = async function (req, res) {
     try {
@@ -72,8 +73,7 @@ const updateBlogs = async function (req, res) {
                 $push: {
                     tag: req.body.tag,
                     subcategory: req.body.subcategory,
-                },
-
+                }
             },
             { new: true, upsert: true }
         )
@@ -87,10 +87,11 @@ const updateBlogs = async function (req, res) {
         }
         return res.status(200).send({ status: true, msg: "data succesfully created", data: updateData })
     }
-    catch (error) {
-        return res.status(500).send({ status: false, msg: "internal server error", error })
+    catch (err) {
+        return res.status(500).send({ status: false, msg : err.message })
     }
 }
+
 
 //delete blogs
 const deleteBlogs = async function (req, res) {
@@ -106,13 +107,13 @@ const deleteBlogs = async function (req, res) {
         const deleteData = await blogModel.updateOne({ _id: blogId }, { $set: { isDeleted: true } }, { new: true })
         return res.status(200).send({ status: true, msg: "data deleted succesfully", data: deleteData })
     }
-    catch (error) {
-        return res.status(500).send({ status: false, msg: "internal server error", })
+    catch (err) {
+        return res.status(500).send({ status: false, msg: err.message })
     }
 }
 
-// delete blogs using query params
 
+// delete blogs using query params
 const deleteBlogsUsingQuery = async function (req, res) {
     try {
         const queryData = req.query
@@ -123,26 +124,25 @@ const deleteBlogsUsingQuery = async function (req, res) {
 
         const alldata = await blogModel.find({ $and: [queryData, { isDeleted: false }, { isPublished: true }] })
 
-        if(alldata.isDeleted == true || alldata.length == 0){
-            return res.status(404).send({status : false, msg : "Blog is already deleted"})
+        if (alldata.isDeleted == true || alldata.length == 0) {
+            return res.status(404).send({ status: false, msg: "Blog is already deleted" })
         }
-        
+
         if (!alldata) {
-            res.status(400).send({ status: false, msg: "no data with this query" })
+            return res.status(400).send({ status: false, msg: "no data with this query" })
         } else {
             const deleteData = await blogModel.updateMany(queryData, { $set: { isDeleted: true, isPublished: false } }, { new: true })
-            
+
             if (deleteData.isDeleted == true) {
                 deleteData.deletedAt = new Date();
             }
             if (deleteData.isDeleted == false) {
                 deleteData.deletedAt = null;
             }
-            return res.status(200).send({ status: true, msg: "data succesfully deleted", data : deleteData })
+            return res.status(200).send({ status: true, msg: "data succesfully deleted"})
         }
     } catch (err) {
         return res.status(500).send({ status: false, msg: err.message })
-
     }
 }
 
