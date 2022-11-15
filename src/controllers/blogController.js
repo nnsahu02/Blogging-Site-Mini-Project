@@ -67,7 +67,7 @@ const updateBlogs = async function (req, res) {
                 $set: {
                     title: req.body.title,
                     body: req.body.body,
-                    isPublished: req.body.isPublished,
+                    isPublished: req.body.isPublished,publishedAt:new Date()
 
                 },
                 $push: {
@@ -77,14 +77,14 @@ const updateBlogs = async function (req, res) {
             },
             { new: true, upsert: true }
         )
-        if (updateData.isPublished == true) {
-            updateData.publishedAt = new Date();
-            // please save in db
-        }
-        if (updateData.isPublished == false) {
-            updateData.publishedAt = null;
-            // please save in db
-        }
+        // if (updateData.isPublished == true) {
+        //     updateData.publishedAt = new Date();
+        //     // please save in db
+        // }
+        // if (updateData.isPublished == false) {
+        //     updateData.publishedAt = null;
+        //     // please save in db
+        // }
         return res.status(200).send({ status: true, msg: "data succesfully created", data: updateData })
     }
     catch (err) {
@@ -105,7 +105,7 @@ const deleteBlogs = async function (req, res) {
             return res.status(404).send({ status: false, msg: "blogDetails is already deleted" })
         }
         const deleteData = await blogModel.updateOne({ _id: blogId }, { $set: { isDeleted: true } }, { new: true })
-        return res.status(200).send({ status: true, msg: "data deleted succesfully", data: deleteData })
+        return res.status(200).send({ status: true, msg: "data deleted succesfully",  })
     }
     catch (err) {
         return res.status(500).send({ status: false, msg: err.message })
@@ -131,15 +131,15 @@ const deleteBlogsUsingQuery = async function (req, res) {
         if (!alldata) {
             return res.status(400).send({ status: false, msg: "no data with this query" })
         } else {
-            const deleteData = await blogModel.updateMany(queryData, { $set: { isDeleted: true, isPublished: false } }, { new: true })
+            const deleteData = await blogModel.updateMany(queryData, { $set: { isDeleted: true,deletedAt:new Date(), isPublished: false } }, { new: true })
 
-            if (deleteData.isDeleted == true) {
-                deleteData.deletedAt = new Date();
-            }
-            if (deleteData.isDeleted == false) {
-                deleteData.deletedAt = null;
-            }
-            return res.status(200).send({ status: true, msg: "data succesfully deleted"})
+            // if (deleteData.isDeleted == true) {
+            //     deleteData.deletedAt = new Date();
+            // }
+            // if (deleteData.isDeleted == false) {
+            //     deleteData.deletedAt = null;
+            // }
+            return res.status(200).send({ status: true, msg: "data succesfully deleted",data:deleteData})
         }
     } catch (err) {
         return res.status(500).send({ status: false, msg: err.message })
