@@ -13,6 +13,12 @@ router.post('/blogs', blogController.createBlog)
 //getting blogdata
 router.get('/blogs', blogController.getBlogs)
 
+//updating blogdata
+router.put('/blogs/:blogId' , blogController.updateBlogs)
+
+//deleting blogdata
+router.delete('/blogs/:blogId' , blogController.deleteBlogs)
+
 
 module.exports = router
 

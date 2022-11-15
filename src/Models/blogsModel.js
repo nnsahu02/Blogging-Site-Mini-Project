@@ -22,7 +22,7 @@ const blogSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    subcategoty: {
+    subcategory: {
         type: [String]
     },
     isDeleted: {
@@ -35,4 +35,4 @@ const blogSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-module.exports = mongoose.model('Blog', blogSchema)
+module.exports = mongoose.model('Blog', blogSchema) // blogs

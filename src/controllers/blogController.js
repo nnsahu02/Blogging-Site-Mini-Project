@@ -1,7 +1,7 @@
 const blogModel = require('../models/blogsModel')
 const authorModel = require('../models/authorModel')
 const { isValidObjectId } = require('mongoose')
-const { get } = require('lodash')
+const { findByIdAndUpdate } = require('../models/blogsModel')
 
 
 //create Blog
@@ -30,22 +30,81 @@ const createBlog = async function (req, res) {
 // get Blog
 const getBlogs = async function (req, res) {
     try {
-        const data = await blogModel.find({ isDeleted: false, isPublished: true })
+        const data = await blogModel.find({ $and: [{ isDeleted: false }, { isPublished: true }] })
         if (!data) {
             return res.status(404).send({ status: false, msg: "no data found!" })
         }
-        const query = req.query
-        let datas = await blogModel.find(query)
-        if (!datas) {
-            return res.status(404).send({ status: false, msg: "not found" })
-        } res.status(200).send({ status: true, data: datas })
+        else if (data) {
+            const query = req.query
+            let datas = await blogModel.find(query)
+            if (!datas) {
+                return res.status(404).send({ status: false, msg: "not found" })
+            }
+            return res.status(200).send({ status: true, data: datas })
+        }
     }
     catch (err) {
         return res.status(500).send({ status: false, msg: err.message })
     }
 }
 
+// update blog
+const updateBlogs = async function (req, res) {
+    try {
+        const blogId = req.param.blogId
+        const blogDetails = await blogModel.find()
+        if (blogDetails._id != blogId) {
+            return res.status(404).send({ status: false, msg: "blogDetails not found" })
+        }
+        if(blogDetails.isDeleted == true) {
+            return res.status(404).send({status : false , msg : "blog details is deleted"})
+        }
+        const updateData = await blogModel.findByIdAndUpdate(
+            { _id: blogId },
+            {
+                $set: {
+                    title: req.body.title,
+                    body: req.body.body,
+                    isPublished: req.body.isPublished,
+                    publishedAt: req.body.publishedAt
+                },
+                $push : {
+                    tag: req.body.tag,
+                    subcategory: req.body.subcategory,
+                }
+            },
+            { new: true, upsert: true }
+        )
+        return res.status(200).send({status : true , msg : "data succesfully created" , data : updateData})
+    }
+    catch (error) {
+       return res.status(500).send({status : false , msg : "internal server error" , error})
+    }
+}
+
+//delete blogs
+const deleteBlogs = async function(req ,res) {
+    try{
+    const blogId = req.params.blogId
+    const blogDetails = await blogModel.find()
+    if(blogDetails._id != blogId) {
+        return res.status(404).send({status : false , msg : "blogDetail is not present"})
+    } 
+    if(blogDetails.isDeleted == true) {
+        return res.status(404).send({status : false , msg : "blogDetails is already deleted"})
+    }
+    const deleteData = await blogModel.updateOne({_id : blogId} , {$set : {isDeleted : true }} , {new : true})
+         return res.status(200).send({status : true , msg : "data deleted succesfully" , data : deleteData})
+    }
+    catch(error) {
+         return res.status(500).send({status : false , msg : "internal server error" , })
+    }
+}
+
+
 
 
 module.exports.createBlog = createBlog
 module.exports.getBlogs = getBlogs
+module.exports.updateBlogs = updateBlogs
+module.exports.deleteBlogs = deleteBlogs

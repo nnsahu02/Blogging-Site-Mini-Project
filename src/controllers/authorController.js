@@ -1,4 +1,3 @@
-const express = require('express')
 const authorModel = require('../models/authorModel')
 
 //Create Author
