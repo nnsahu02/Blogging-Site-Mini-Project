@@ -1,7 +1,8 @@
 const blogModel = require('../models/blogsModel')
 const authorModel = require('../models/authorModel')
 const { isValidObjectId } = require('mongoose')
-const { findByIdAndUpdate } = require('../models/blogsModel')
+const { object } = require('webidl-conversions')
+//const { findByIdAndUpdate } = require('../models/blogsModel')
 
 
 //create Blog
@@ -78,9 +79,11 @@ const updateBlogs = async function (req, res) {
         )
         if (updateData.isPublished == true) {
             updateData.publishedAt = new Date();
+            // please save in db
         }
         if (updateData.isPublished == false) {
             updateData.publishedAt = null;
+            // please save in db
         }
         return res.status(200).send({ status: true, msg: "data succesfully created", data: updateData })
     }
@@ -93,7 +96,7 @@ const updateBlogs = async function (req, res) {
 const deleteBlogs = async function (req, res) {
     try {
         const blogId = req.params.blogId
-        const blogDetails = await blogModel.find()
+        const blogDetails = await blogModel.findById(blogId)
         if (blogDetails._id != blogId) {
             return res.status(404).send({ status: false, msg: "blogDetail is not present" })
         }
@@ -108,6 +111,41 @@ const deleteBlogs = async function (req, res) {
     }
 }
 
+// delete blogs using query params
+
+const deleteBlogsUsingQuery = async function (req, res) {
+    try {
+        const queryData = req.query
+
+        if (Object.keys(queryData).length == 0) {
+            return res.status(400).send({ status: false, msg: "enter some data in query" })
+        }
+
+        const alldata = await blogModel.find({ $and: [queryData, { isDeleted: false }, { isPublished: true }] })
+
+        if(alldata.isDeleted == true || alldata.length == 0){
+            return res.status(404).send({status : false, msg : "Blog is already deleted"})
+        }
+        
+        if (!alldata) {
+            res.status(400).send({ status: false, msg: "no data with this query" })
+        } else {
+            const deleteData = await blogModel.updateMany(queryData, { $set: { isDeleted: true, isPublished: false } }, { new: true })
+            
+            if (deleteData.isDeleted == true) {
+                deleteData.deletedAt = new Date();
+            }
+            if (deleteData.isDeleted == false) {
+                deleteData.deletedAt = null;
+            }
+            return res.status(200).send({ status: true, msg: "data succesfully deleted", data : deleteData })
+        }
+    } catch (err) {
+        return res.status(500).send({ status: false, msg: err.message })
+
+    }
+}
+
 
 
 
@@ -115,3 +153,4 @@ module.exports.createBlog = createBlog
 module.exports.getBlogs = getBlogs
 module.exports.updateBlogs = updateBlogs
 module.exports.deleteBlogs = deleteBlogs
+module.exports.deleteBlogsUsingQuery = deleteBlogsUsingQuery
