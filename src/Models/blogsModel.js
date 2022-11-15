@@ -29,6 +29,10 @@ const blogSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    publishedAt: {
+        type: Date,
+        dafault: null
+    },
     isPublished: {
         type: Boolean,
         default: false
