@@ -53,7 +53,7 @@ const getBlogs = async function (req, res) {
 // update blog
 const updateBlogs = async function (req, res) {
     try {
-        const blogId = req.params.blogId
+        const blogId = req.params.blogId // blogId check
         const blogDetails = await blogModel.findById(blogId)
         if (blogDetails._id != blogId) {
             return res.status(404).send({ status: false, msg: "blogDetails not found" })
@@ -77,14 +77,6 @@ const updateBlogs = async function (req, res) {
             },
             { new: true, upsert: true }
         )
-        // if (updateData.isPublished == true) {
-        //     updateData.publishedAt = new Date();
-        //     // please save in db
-        // }
-        // if (updateData.isPublished == false) {
-        //     updateData.publishedAt = null;
-        //     // please save in db
-        // }
         return res.status(200).send({ status: true, msg: "data succesfully created", data: updateData })
     }
     catch (err) {
