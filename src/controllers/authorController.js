@@ -29,7 +29,7 @@ const loginAuthor = async function (req, res) {
         if (!authorData) {
             return res.status(404).send({ status: false, msg: "data not found" })
         }
-        const token = jwt.sign({ authorId: authorData._id.toString() }, "projectsecretcode")
+        const token = jwt.sign({ authorId: authorData._id.toString()}, "projectsecretcode")
         return res.status(200).send({ status: true, msg: "succesfull logged in", token })
     }
     catch (error) {

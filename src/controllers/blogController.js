@@ -104,7 +104,7 @@ const deleteBlogs = async function (req, res) {
         if (blogDetails.isDeleted == true) {
             return res.status(404).send({ status: false, msg: "blogDetails is already deleted" })
         }
-        const deleteData = await blogModel.updateOne({ _id: blogId }, { $set: { isDeleted: true } }, { new: true })
+        const deleteData = await blogModel.updateOne({ _id: blogId }, { $set: { isDeleted: true,deletedAt:new Date() } }, { new: true })
         return res.status(200).send({ status: true, msg: "data deleted succesfully",  })
     }
     catch (err) {

@@ -3,24 +3,29 @@ const router = express.Router()
 const authorController = require("../controllers/authorController")
 const mailValidation = require("../middleware/mailValidation")
 const blogController = require('../controllers/blogController')
+const authMiddleWare = require("../middleware/auth")
 
 //creating Author
 router.post("/authors", mailValidation.validateEmail, authorController.createAuthor)
 
 //creating blogs
-router.post('/blogs', blogController.createBlog)
+router.post('/blogs',authMiddleWare.authenticateAuthor, blogController.createBlog)
 
 //getting blogdata
-router.get('/blogs', blogController.getBlogs)
+router.get('/blogs',authMiddleWare.authenticateAuthor, blogController.getBlogs)
 
 //updating blogdata
-router.put('/blogs/:blogId' , blogController.updateBlogs)
+router.put('/blogs/:blogId', authMiddleWare.authenticateAuthor ,authMiddleWare.authoriseAuhtor, blogController.updateBlogs)
 
 //deleting blogdata
-router.delete('/blogs/:blogId' , blogController.deleteBlogs)
+router.delete('/blogs/:blogId', authMiddleWare.authenticateAuthor ,authMiddleWare.authoriseAuhtor, blogController.deleteBlogs)
 
 //deleting blogdata using query
-router.delete('/blogs', blogController.deleteBlogsUsingQuery)
+router.delete('/blogs',authMiddleWare.authenticateAuthor,authMiddleWare.authoriseAuthorfrmQuery, blogController.deleteBlogsUsingQuery)
+
+//login author
+router.post('/login', authorController.loginAuthor)
+
 
 
 module.exports = router
