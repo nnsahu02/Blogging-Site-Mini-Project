@@ -132,13 +132,7 @@ const deleteBlogsUsingQuery = async function (req, res) {
             return res.status(400).send({ status: false, msg: "no data with this query" })
         } else {
             const deleteData = await blogModel.updateMany(queryData, { $set: { isDeleted: true,deletedAt:new Date(), isPublished: false } }, { new: true })
-
-            // if (deleteData.isDeleted == true) {
-            //     deleteData.deletedAt = new Date();
-            // }
-            // if (deleteData.isDeleted == false) {
-            //     deleteData.deletedAt = null;
-            // }
+            
             return res.status(200).send({ status: true, msg: "data succesfully deleted",data:deleteData})
         }
     } catch (err) {
