@@ -2,7 +2,7 @@ const authorModel = require('../models/authorModel')
 
 
 //validating email
-const validateEmail = function (req, res, next) {
+const validateEmail = async function (req, res, next) {
     try {
         let validMail = /^[A-Za-z.]{2,}@[A-Za-z]{2,}[.]{1}[A-Za-z.]{2,3}$/
         let check = validMail.test(req.body.email)

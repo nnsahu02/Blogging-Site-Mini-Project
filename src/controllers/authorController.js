@@ -1,12 +1,34 @@
 const authorModel = require('../models/authorModel')
 const jwt = require('jsonwebtoken')
 
+
+const isValid = function(value){
+    if(typeof value == 'undefined' || value == 'null') 
+    return false
+    if(typeof value == 'string' && value.trim().length == 1 ) 
+    return true
+}
+
 //Create Author
 const createAuthor = async function (req, res) {
     const { fname, lname, title, email, password } = req.body
     try {
         if (!fname || !lname || !title || !email || !password) {
             return res.status(400).send({ status: false, msg: "all field is required" })
+        }
+        // making mail unique
+        const CheckMail = await authorModel.findOne({email : email})
+        if(CheckMail){
+            return res.status(400).send({status : false, msg : "mail is already exist."})
+        }
+        // enum validating
+        const enumTitle = ["Mr", "Mrs", "Miss"]
+        if(!enumTitle.includes(title)){
+            return res.status(400).send({status : false, msg : "Please yr esa mat karo  'Mr','Mrs','Miss' he do ! ",})
+        }
+        //
+        if(!isValid(fname)){
+            return res.status(400).send({status : false, msg : "Ye v koi Nam hota hai !"})
         }
         else {
             const data = await authorModel.create({ fname, lname, title, email, password })

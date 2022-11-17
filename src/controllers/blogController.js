@@ -37,9 +37,15 @@ const getBlogs = async function (req, res) {
         }
         else if (data) {
             const query = req.query
+            if (Object.keys(query).length == 0) {
+                return res.status(400).send({ status: false, msg: "provide some data in query" })
+            }
             let datas = await blogModel.find(query)
             if (!datas) {
                 return res.status(404).send({ status: false, msg: "not found" })
+            }
+            if (datas.length == 0) {
+                return res.status(404).send({ status: false, msg: "no data found !" })
             }
             return res.status(200).send({ status: true, data: datas })
         }
@@ -67,7 +73,7 @@ const updateBlogs = async function (req, res) {
                 $set: {
                     title: req.body.title,
                     body: req.body.body,
-                    isPublished: req.body.isPublished,publishedAt:new Date()
+                    isPublished: req.body.isPublished, publishedAt: new Date()
 
                 },
                 $push: {
@@ -80,7 +86,7 @@ const updateBlogs = async function (req, res) {
         return res.status(200).send({ status: true, msg: "data succesfully created", data: updateData })
     }
     catch (err) {
-        return res.status(500).send({ status: false, msg : err.message })
+        return res.status(500).send({ status: false, msg: err.message })
     }
 }
 
@@ -96,8 +102,8 @@ const deleteBlogs = async function (req, res) {
         if (blogDetails.isDeleted == true) {
             return res.status(404).send({ status: false, msg: "blogDetails is already deleted" })
         }
-        const deleteData = await blogModel.updateOne({ _id: blogId }, { $set: { isDeleted: true,deletedAt:new Date() } }, { new: true })
-        return res.status(200).send({ status: true, msg: "data deleted succesfully",  })
+        const deleteData = await blogModel.updateOne({ _id: blogId }, { $set: { isDeleted: true, deletedAt: new Date() } }, { new: true })
+        return res.status(200).send({ status: true, msg: "data deleted succesfully", })
     }
     catch (err) {
         return res.status(500).send({ status: false, msg: err.message })
@@ -123,9 +129,9 @@ const deleteBlogsUsingQuery = async function (req, res) {
         if (!alldata) {
             return res.status(400).send({ status: false, msg: "no data with this query" })
         } else {
-            const deleteData = await blogModel.updateMany(queryData, { $set: { isDeleted: true,deletedAt:new Date(), isPublished: false } }, { new: true })
-            
-            return res.status(200).send({ status: true, msg: "data succesfully deleted",data:deleteData})
+            const deleteData = await blogModel.updateMany(queryData, { $set: { isDeleted: true, deletedAt: new Date(), isPublished: false } }, { new: true })
+
+            return res.status(200).send({ status: true, msg: "data succesfully deleted", data: deleteData })
         }
     } catch (err) {
         return res.status(500).send({ status: false, msg: err.message })
