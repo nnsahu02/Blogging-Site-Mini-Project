@@ -51,6 +51,9 @@ const authoriseAuthorfrmQuery = async function (req, res, next) {
     try {
         const queryData = req.query
         const queryDoc = await blogsModel.find(queryData)
+        if(queryDoc.length == 0){
+            return res.status(404).send({status : false, msg : "data not found!"})
+        }
         for (let i = 0; i < queryDoc.length; i++) {
             let elem = queryDoc[i]
             let authorId = elem.authorId.toString()
