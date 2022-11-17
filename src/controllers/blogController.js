@@ -53,7 +53,7 @@ const createBlog = async function (req, res) {
         }
         // subcategory validation
         if (!isvalidtagsandsubcat(subcategory)) {
-            return res.status(400).send({ status: false, msg: "subcategory is invalid! (please take subcategory in array of string)" })
+            return res.status(400).send({ status: false, msg: "subcategory is required or invalid! (please take subcategory in array of string)" })
         }
         // authorId validation
         if (!isValidObjectId(authorId)) {
@@ -90,18 +90,22 @@ const getBlogs = async function (req, res) {
         }
         else if (data) {
             const query = req.query
+
             // checking data from query is comming or not
             if (Object.keys(query).length == 0) {
                 return res.status(400).send({ status: false, msg: "provide some data in query" })
             }
-            let datas = await blogModel.find(query)
-            // checking data is coming from db 
-            if (!datas) {
-                return res.status(404).send({ status: false, msg: "not found" })
+            // checking correct authorId is coming or not
+            if (query.authorId !== req.token.authorId) {
+                return res.status(400).send({ status: false, msg: "no data with this query." })
             }
+            let datas = await blogModel.find(query)
             // checking data is coming from db 
             if (datas.length == 0) {
                 return res.status(404).send({ status: false, msg: "no data found !" })
+            }
+            if (!datas) {
+                return res.status(404).send({ status: false, msg: "not found" })
             }
             return res.status(200).send({ status: true, data: datas })
         }
@@ -173,7 +177,7 @@ const deleteBlogs = async function (req, res) {
             return res.status(400).send({ status: false, msg: "blogId is required." })
         }
         const blogDetails = await blogModel.findById(blogId)
-        
+
         // checking blogdata is coming from db or not
         if (!blogDetails) {
             return res.status(404).send({ status: false, msg: "No data found!" })

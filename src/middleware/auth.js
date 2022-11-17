@@ -68,7 +68,7 @@ const authoriseAuthorfrmQuery = async function (req, res, next) {
             let elem = queryDoc[i]
             let authorId = elem.authorId.toString()
             if (authorId !== req.token.authorId) {
-                return res.status(400).send({ status: false, msg: "access denied!!" })
+                return res.status(403).send({ status: false, msg: "access denied!!" })
             } else {
                 next()
             }

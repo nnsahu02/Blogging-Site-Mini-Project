@@ -94,7 +94,7 @@ const loginAuthor = async function (req, res) {
         }
         const authorData = await authorModel.findOne({ email: email, password: password })
         if (!authorData) {
-            return res.status(404).send({ status: false, msg: "data not found" })
+            return res.status(400).send({ status: false, msg: "incorrect email or password" })
         }
         const token = jwt.sign({ authorId: authorData._id.toString() }, "projectsecretcode")
         return res.status(200).send({ status: true, msg: "succesfull logged in", token })
