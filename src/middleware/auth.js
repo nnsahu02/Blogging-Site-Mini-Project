@@ -2,6 +2,8 @@ const jwt = require('jsonwebtoken')
 const { isValidObjectId } = require('mongoose')
 const blogsModel = require('../models/blogsModel')
 
+//---------------------------------------------AUTHENTICATING AUTHOR--------------------------------------------------//
+
 const authenticateAuthor = async function (req, res, next) {
     const token = req.headers['x-api-key']
     try {
@@ -22,8 +24,11 @@ const authenticateAuthor = async function (req, res, next) {
     }
 }
 
+//---------------------------------------------------------------------------------------------------------------------//
 
-// authorisation
+
+//---------------------------------------------AUTHORIZE AUTHOR--------------------------------------------------//
+
 const authoriseAuhtor = async function (req, res, next) {
     try {
         const blogId = req.params.blogId
@@ -46,13 +51,18 @@ const authoriseAuhtor = async function (req, res, next) {
     }
 }
 
-//authenticating author from query
+//---------------------------------------------------------------------------------------------------------------//
+
+
+
+//---------------------------------------------authenticating author from query--------------------------------------------------//
+
 const authoriseAuthorfrmQuery = async function (req, res, next) {
     try {
         const queryData = req.query
         const queryDoc = await blogsModel.find(queryData)
-        if(queryDoc.length == 0){
-            return res.status(404).send({status : false, msg : "data not found!"})
+        if (queryDoc.length == 0) {
+            return res.status(404).send({ status: false, msg: "data not found!" })
         }
         for (let i = 0; i < queryDoc.length; i++) {
             let elem = queryDoc[i]
@@ -68,6 +78,8 @@ const authoriseAuthorfrmQuery = async function (req, res, next) {
         return res.status(500).send({ status: false, msg: err.message })
     }
 }
+
+//------------------------------------------------------------------------------------------------------------------//
 
 module.exports.authenticateAuthor = authenticateAuthor
 module.exports.authoriseAuhtor = authoriseAuhtor

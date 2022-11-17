@@ -25,8 +25,7 @@ const authorSchema = new mongoose.Schema({
     },
     "password": {
         type: String,
-        required: true,
-        match : /^[A-Za-z0-9]{3,15}$/
+        required: true
     },
     "isDeleted": {
         type: Boolean,

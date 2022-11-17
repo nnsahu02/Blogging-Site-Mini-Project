@@ -1,11 +1,11 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const route = require('./routes/route')
-//const bodyParser = require('body-parser')
+
+
 const app = express()
 app.use(express.json())
-// app.use(bodyParser.json())
-// app.use(bodyParser.urlencoded({ extended: true }))
+
 
 mongoose.connect('mongodb+srv://nnsahu2022:Sahurk012@mycluster.ne522qz.mongodb.net/project1', {
     useNewUrlParser: true

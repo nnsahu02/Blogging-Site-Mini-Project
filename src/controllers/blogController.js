@@ -5,13 +5,57 @@ const { object } = require('webidl-conversions')
 //const { findByIdAndUpdate } = require('../models/blogsModel')
 
 
-//create Blog
+//-------------------------------------------------VALIDATION--------------------------------------------------//
+
+const isValid = function (value) { // function for title and body validation
+
+    if (typeof value == 'undefined' || value == 'null')
+        return false
+    if (typeof value == 'string' && value.trim().length >= 1)
+        return true
+}
+
+const isvalidtagsandsubcat = function (value) { // function for tags and subcategory validation
+    if (typeof value == 'undefined' || value == 'null')
+        return false
+    if (typeof value == 'object')
+        return true
+}
+
+//--------------------------------------------------------------------------------------------------------------//
+
+
+
+
+//-----------------------------------------------CREATING BLOGS--------------------------------------------------//
+
 const createBlog = async function (req, res) {
-    const { title, body, authorId, tag, category, subcategory, isPublished, isDeleted } = req.body
+    const { title, body, authorId, tags, category, subcategory, isPublished, isDeleted } = req.body
     try {
         if (!title || !body || !authorId || !category) {
             return res.status(400).send({ status: false, msg: "all fields are required" })
         }
+        // title validation
+        if (!isValid(title)) {
+            return res.status(400).send({ status: false, msg: "title is invalid! (please take title in string)" })
+        }
+        // body validation
+        if (!isValid(body)) {
+            return res.status(400).send({ status: false, msg: "body is invalid! (please take body in string)" })
+        }
+        // category validation
+        if (!isValid(category)) {
+            return res.status(400).send({ status: false, msg: "category is invalid! (please take category in string)" })
+        }
+        // tags validation
+        if (!isvalidtagsandsubcat(tags)) {
+            return res.status(400).send({ status: false, msg: "tags is invalid! (please take tags in array of string)" })
+        }
+        // subcategory validation
+        if (!isvalidtagsandsubcat(subcategory)) {
+            return res.status(400).send({ status: false, msg: "subcategory is invalid! (please take subcategory in array of string)" })
+        }
+        // authorId validation
         if (!isValidObjectId(authorId)) {
             return res.status(400).send({ status: false, msg: "invalid authorid in validation" })
         }
@@ -19,7 +63,7 @@ const createBlog = async function (req, res) {
         if (!authorDetail) {
             return res.status(400).send({ status: false, msg: "invalid authorid" })
         }
-        const data = await blogModel.create({ title, body, authorId, tag, category, subcategory, isPublished, isDeleted })
+        const data = await blogModel.create({ title, body, authorId, tags, category, subcategory, isPublished, isDeleted })
         return res.status(201).send({ status: true, data: "succesfully created data", data })
     }
     catch (err) {
@@ -27,23 +71,35 @@ const createBlog = async function (req, res) {
     }
 }
 
+//-------------------------------------------------------------------------------------------------------------------//
 
-// get Blog
+
+
+//-----------------------------------------------------GET BLOGS-----------------------------------------------------//
+
 const getBlogs = async function (req, res) {
     try {
         const data = await blogModel.find({ $and: [{ isDeleted: false }, { isPublished: true }] })
+
+        // validating isdeleted and ispublished data is coming or not 
+        if (data.length == 0) {
+            return res.status(404).send({ status: false, msg: "no data found!" })
+        }
         if (!data) {
             return res.status(404).send({ status: false, msg: "no data found!" })
         }
         else if (data) {
             const query = req.query
+            // checking data from query is comming or not
             if (Object.keys(query).length == 0) {
                 return res.status(400).send({ status: false, msg: "provide some data in query" })
             }
             let datas = await blogModel.find(query)
+            // checking data is coming from db 
             if (!datas) {
                 return res.status(404).send({ status: false, msg: "not found" })
             }
+            // checking data is coming from db 
             if (datas.length == 0) {
                 return res.status(404).send({ status: false, msg: "no data found !" })
             }
@@ -55,12 +111,25 @@ const getBlogs = async function (req, res) {
     }
 }
 
+//----------------------------------------------------------------------------------------------------------------------//
 
-// update blog
+
+
+//-------------------------------------------------UPDATING BLOG-------------------------------------------------------//
+
 const updateBlogs = async function (req, res) {
     try {
         const blogId = req.params.blogId // blogId check
+
+        // checking blogId is coming or not
+        if (!blogId) {
+            return res.status(400).send({ status: false, msg: "BlogId is required" })
+        }
         const blogDetails = await blogModel.findById(blogId)
+        // checking blogdata is coming from db or not
+        if (!blogDetails) {
+            return res.status(404).send({ status: false, msg: "blogDetails not found" })
+        }
         if (blogDetails._id != blogId) {
             return res.status(404).send({ status: false, msg: "blogDetails not found" })
         }
@@ -77,7 +146,7 @@ const updateBlogs = async function (req, res) {
 
                 },
                 $push: {
-                    tag: req.body.tag,
+                    tags: req.body.tags,
                     subcategory: req.body.subcategory,
                 }
             },
@@ -90,12 +159,25 @@ const updateBlogs = async function (req, res) {
     }
 }
 
+//-----------------------------------------------------------------------------------------------------------------------//
 
-//delete blogs
+
+
+//----------------------------------------------DELETING BLOGS USING PATH PARAMS-----------------------------------------//
+
 const deleteBlogs = async function (req, res) {
     try {
         const blogId = req.params.blogId
+        // checking blogId is coming or not
+        if (!blogId) {
+            return res.status(400).send({ status: false, msg: "blogId is required." })
+        }
         const blogDetails = await blogModel.findById(blogId)
+        
+        // checking blogdata is coming from db or not
+        if (!blogDetails) {
+            return res.status(404).send({ status: false, msg: "No data found!" })
+        }
         if (blogDetails._id != blogId) {
             return res.status(404).send({ status: false, msg: "blogDetail is not present" })
         }
@@ -110,12 +192,17 @@ const deleteBlogs = async function (req, res) {
     }
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------//
 
-// delete blogs using query params
+
+
+//----------------------------------------------------DELETING BLOGS USING QUERY PARAMS--------------------------------------------------//
+
 const deleteBlogsUsingQuery = async function (req, res) {
     try {
         const queryData = req.query
 
+        // checking data is coming from query 
         if (Object.keys(queryData).length == 0) {
             return res.status(400).send({ status: false, msg: "enter some data in query" })
         }
@@ -131,12 +218,14 @@ const deleteBlogsUsingQuery = async function (req, res) {
         } else {
             const deleteData = await blogModel.updateMany(queryData, { $set: { isDeleted: true, deletedAt: new Date(), isPublished: false } }, { new: true })
 
-            return res.status(200).send({ status: true, msg: "data succesfully deleted", data: deleteData })
+            return res.status(200).send({ status: true, msg: "data succesfully deleted" })
         }
     } catch (err) {
         return res.status(500).send({ status: false, msg: err.message })
     }
 }
+
+//-------------------------------------------------------------------------------------------------------------------//
 
 
 

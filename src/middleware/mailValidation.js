@@ -1,7 +1,8 @@
 const authorModel = require('../models/authorModel')
 
 
-//validating email
+//---------------------------------------------validating email--------------------------------------------------//
+
 const validateEmail = async function (req, res, next) {
     try {
         let validMail = /^[A-Za-z.]{2,}@[A-Za-z]{2,}[.]{1}[A-Za-z.]{2,3}$/
@@ -16,5 +17,7 @@ const validateEmail = async function (req, res, next) {
         return res.status(500).send({ status: false, msg: err.message })
     }
 }
+
+//--------------------------------------------------------------------------------------------------------------//
 
 module.exports.validateEmail = validateEmail

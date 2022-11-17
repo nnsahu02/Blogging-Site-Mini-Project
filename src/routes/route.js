@@ -24,7 +24,7 @@ router.delete('/blogs/:blogId', authMiddleWare.authenticateAuthor ,authMiddleWar
 router.delete('/blogs',authMiddleWare.authenticateAuthor,authMiddleWare.authoriseAuthorfrmQuery, blogController.deleteBlogsUsingQuery)
 
 //login author
-router.post('/login', authorController.loginAuthor)
+router.post('/login', mailValidation.validateEmail , authorController.loginAuthor)
 
 
 
