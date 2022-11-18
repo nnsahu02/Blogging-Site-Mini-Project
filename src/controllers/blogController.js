@@ -95,10 +95,6 @@ const getBlogs = async function (req, res) {
             if (Object.keys(query).length == 0) {
                 return res.status(400).send({ status: false, msg: "provide some data in query" })
             }
-            // checking correct authorId is coming or not
-            if (query.authorId !== req.token.authorId) {
-                return res.status(400).send({ status: false, msg: "no data with this query." })
-            }
             let datas = await blogModel.find(query)
             // checking data is coming from db 
             if (datas.length == 0) {
