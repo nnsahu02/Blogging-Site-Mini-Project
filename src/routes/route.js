@@ -26,6 +26,11 @@ router.delete('/blogs',authMiddleWare.authenticateAuthor,authMiddleWare.authoris
 //login author
 router.post('/login', mailValidation.validateEmail , authorController.loginAuthor)
 
+//some error path
+router.all('/*',function(req,res){
+    return res.status(400).send({status:false,msg:"Please give right path"})
+})
+
 
 
 module.exports = router

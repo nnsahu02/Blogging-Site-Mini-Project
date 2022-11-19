@@ -90,13 +90,15 @@ const getBlogs = async function (req, res) {
         }
         else if (data) {
             const query = req.query
+            //authorId validation for query
+            if(query.authorId){
+                if(!isValidObjectId(query.authorId)){
+                    return res.status(400).send({status:false,msg:"authorId is not valid"})
+                }}
 
-            // checking data from query is comming or not
-            if (Object.keys(query).length == 0) {
-                return res.status(400).send({ status: false, msg: "provide some data in query" })
-            }
-            let datas = await blogModel.find(query)
+            let datas = await blogModel.find({$or:[{ isDeleted: false }, { isPublished: true },query] })
             // checking data is coming from db 
+            
             if (datas.length == 0) {
                 return res.status(404).send({ status: false, msg: "no data found !" })
             }
@@ -105,7 +107,8 @@ const getBlogs = async function (req, res) {
             }
             return res.status(200).send({ status: true, data: datas })
         }
-    }
+        return res.status(200).send({status:true,msg:data})   
+     }
     catch (err) {
         return res.status(500).send({ status: false, msg: err.message })
     }
