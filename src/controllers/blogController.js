@@ -96,7 +96,7 @@ const getBlogs = async function (req, res) {
                     return res.status(400).send({status:false,msg:"authorId is not valid"})
                 }}
 
-            let datas = await blogModel.find({$or:[{ isDeleted: false }, { isPublished: true },query] })
+            let datas = await blogModel.find(query)
             // checking data is coming from db 
             
             if (datas.length == 0) {
