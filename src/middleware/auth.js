@@ -55,7 +55,7 @@ const authoriseAuhtor = async function (req, res, next) {
 
 
 
-//---------------------------------------------authenticating author from query--------------------------------------------------//
+//---------------------------------------------AUTHORIZING AUTHOR FROM QUERY--------------------------------------------------//
 
 const authoriseAuthorfrmQuery = async function (req, res, next) {
     try {

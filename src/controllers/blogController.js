@@ -1,8 +1,6 @@
 const blogModel = require('../models/blogsModel')
 const authorModel = require('../models/authorModel')
 const { isValidObjectId } = require('mongoose')
-const { object } = require('webidl-conversions')
-//const { findByIdAndUpdate } = require('../models/blogsModel')
 
 
 //-------------------------------------------------VALIDATION--------------------------------------------------//
@@ -79,40 +77,46 @@ const createBlog = async function (req, res) {
 
 const getBlogs = async function (req, res) {
     try {
-        const data = await blogModel.find({ $and: [{ isDeleted: false }, { isPublished: true }] })
+        let queryData = req.query        // receving data from query
 
-        // validating isdeleted and ispublished data is coming or not 
+        if (queryData.category == "") {
+            return res.status(400).send({ status: false, msg: "please provide some data in category field!" })
+        }
+
+        if (queryData.title == "") {
+            return res.status(400).send({ status: false, msg: "please provide some data in title field!" })
+        }
+
+        if (queryData.body == "") {
+            return res.status(400).send({ status: false, msg: "please provide some data in body field!" })
+        }
+
+        queryData["iPublished"] = true   // adding isPublished in queryData
+        queryData["isDeleted"] = false   // adding isPublished in queryData
+
+
+        let authorId = req.query.authorId  // if we are sending authorID in query 
+
+        if (authorId == "") {              // if we are not sending authorID in query(value)
+            return res.status(400).send({ status: false, msg: "please provide an authorId in authorId field!" });
+        }
+
+        if (authorId && !isValidObjectId(authorId)) {    // validating the authorId
+            return res.status(400).send({ status: false, msg: "please enter valid authorId" });
+        }
+
+        const data = await blogModel.find(queryData);    // finding querydata with isPublished true and IsDeleted false.
+
         if (data.length == 0) {
-            return res.status(404).send({ status: false, msg: "no data found!" })
+            return res.status(404).send({ status: false, msg: "No data found!" })
         }
-        if (!data) {
-            return res.status(404).send({ status: false, msg: "no data found!" })
-        }
-        else if (data) {
-            const query = req.query
-            //authorId validation for query
-            if(query.authorId){
-                if(!isValidObjectId(query.authorId)){
-                    return res.status(400).send({status:false,msg:"authorId is not valid"})
-                }}
 
-            let datas = await blogModel.find(query)
-            // checking data is coming from db 
-            
-            if (datas.length == 0) {
-                return res.status(404).send({ status: false, msg: "no data found !" })
-            }
-            if (!datas) {
-                return res.status(404).send({ status: false, msg: "not found" })
-            }
-            return res.status(200).send({ status: true, data: datas })
-        }
-        return res.status(200).send({status:true,msg:data})   
-     }
-    catch (err) {
-        return res.status(500).send({ status: false, msg: err.message })
+        return res.status(200).send({ status: true, data: data })
+
+    } catch (err) {
+        res.status(500).send({ status: false, msg: err.message })
     }
-}
+};
 
 //----------------------------------------------------------------------------------------------------------------------//
 
