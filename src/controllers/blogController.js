@@ -159,7 +159,7 @@ const updateBlogs = async function (req, res) {
             },
             { new: true, upsert: true }
         )
-        return res.status(200).send({ status: true, msg: "data succesfully created", data: updateData })
+        return res.status(200).send({ status: true, msg: "data succesfully Updated.", data: updateData })
     }
     catch (err) {
         return res.status(500).send({ status: false, msg: err.message })
